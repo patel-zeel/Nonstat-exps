@@ -54,7 +54,7 @@ result_dict = {'best_model':None,
            'pred_y':None,
            'test_y':None,
            'RMSE':None}
-recompute = False
+recompute = True
 path = main_path+'results/raw_gp_lls_self/'
 ts_n = int(sys.argv[1])
 ts = df.index.unique()[ts_n]
@@ -66,7 +66,7 @@ if os.path.exists(path+kernel+'/ts_'+str(ts)+'_fold_'+str(fold)):
 
 scaler = StandardScaler()
 for N in [3,4,5,6,7,8,9]:
-    model = LLS(2,N_l_bar=N,kernel=kernel, bounds=(10**-3, 10**3), l_isotropic=False)
+    model = LLS(2,N_l_bar=N,kernel=kernel, bounds=(10**-3, 10**5), l_isotropic=False)
     model.fit(scaler.fit_transform(data[fold]['train_Xy'][0].loc[ts].values), data[fold]['train_Xy'][1].loc[ts].values)
     pred_y = model.predict(scaler.transform(data[fold]['val_Xy'][0].loc[ts].values), False)
     error = mean_squared_error(data[fold]['val_Xy'][1].loc[ts].values, pred_y, squared=False)
@@ -81,11 +81,14 @@ for part in ['train','val','test']:
     result_dict[part+'_Xy'] = (data[fold][part+'_Xy'][0].loc[ts].values, data[fold][part+'_Xy'][1].loc[ts].values)
 result_dict['pred_y'] = pred_y
 result_dict['test_y'] = data[fold]['test_Xy'][1].loc[ts].values
-# print(mean_squared_error(result_dict['test_y'], pred_y, squared=False), result_dict['best_hyperpara']['N'])
-# print('test_y', result_dict['test_y'].squeeze().astype(int).tolist())
-# print('pred_y', pred_y.squeeze().astype(int).tolist())
+print(mean_squared_error(result_dict['test_y'], pred_y, squared=False), result_dict['best_hyperpara']['N'])
+print('test_y', result_dict['test_y'].squeeze().astype(int).tolist())
+print('pred_y', pred_y.squeeze().astype(int).tolist())
+print('len', scaler.transform(data[fold]['test_Xy'][0].loc[ts].values))
+print(model.params)
+pd.to_pickle(model, main_path+'scripts/scratch/test_model')
 # print(result_dict)
-pd.to_pickle(result_dict, path+kernel+'/ts_'+str(ts)+'_fold_'+str(fold))
-counter = pd.read_pickle(path+kernel+'_count')
-counter += 1
-pd.to_pickle(counter, path+kernel+'_count')
+# pd.to_pickle(result_dict, path+kernel+'/ts_'+str(ts)+'_fold_'+str(fold))
+# counter = pd.read_pickle(path+kernel+'_count')
+# counter += 1
+# pd.to_pickle(counter, path+kernel+'_count')

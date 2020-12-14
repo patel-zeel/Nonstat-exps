@@ -53,7 +53,7 @@ result_dict = {'best_model':None,
            'pred_y':None,
            'test_y':None,
            'RMSE':None}
-recompute = False
+recompute = True
 path = main_path+'results/raw_gp_rbf/'
 ts_n = int(sys.argv[1])
 ts = df.index.unique()[ts_n]

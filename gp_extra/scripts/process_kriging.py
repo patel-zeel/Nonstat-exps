@@ -70,7 +70,7 @@ if os.path.exists(path+'ts_'+str(ts)+'_fold_'+str(fold)):
 scaler = StandardScaler()
 for nlag in [3,4,5,6,7,8,9]: # 6 is default
 #     print('checking',nlag)
-    model = Kriging(variogram_model='gaussian', nlags=nlag)
+    model = Kriging(nlags=nlag)
     model.fit(scaler.fit_transform(data[fold]['train_Xy'][0].loc[ts].values), data[fold]['train_Xy'][1].loc[ts].values)
     pred_y = model.predict(scaler.transform(data[fold]['val_Xy'][0].loc[ts].values))
     error = mean_squared_error(data[fold]['val_Xy'][1].loc[ts].values, pred_y, squared=True)
@@ -85,7 +85,7 @@ for part in ['train','val','test']:
     result_dict[part+'_Xy'] = (data[fold][part+'_Xy'][0].loc[ts].values, data[fold][part+'_Xy'][1].loc[ts].values)
 result_dict['pred_y'] = pred_y
 result_dict['test_y'] = data[fold]['test_Xy'][1].loc[ts].values
-print(mean_squared_error(result_dict['test_y'], pred_y, squared=False))
-print('test_y', result_dict['test_y'].squeeze().astype(int).tolist())
-print('pred_y', pred_y.astype(int).tolist())
+# print(mean_squared_error(result_dict['test_y'], pred_y, squared=False))
+# print('test_y', result_dict['test_y'].squeeze().astype(int).tolist())
+# print('pred_y', pred_y.astype(int).tolist())
 pd.to_pickle(result_dict, path+'ts_'+str(ts)+'_fold_'+str(fold))
